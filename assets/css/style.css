@@ -1,6 +1,15 @@
-:root {
-    color-scheme: light dark;
+/*
+|--------------------------------------------------------------------------
+| Anonymous Cloud Notes - Stylesheet
+|--------------------------------------------------------------------------
+| Modern, minimal, and accessible design with light/dark mode support.
+| Feel free to customize colors and layout for your own fork.
+|--------------------------------------------------------------------------
+*/
 
+:root {
+    /* Light mode defaults */
+    color-scheme: light dark;
     --bg: #ffffff;
     --bg-secondary: #f5f5f5;
     --text: #111111;
@@ -13,6 +22,7 @@
 
 @media (prefers-color-scheme: dark) {
     :root {
+        /* Dark mode colors */
         --bg: #121212;
         --bg-secondary: #1e1e1e;
         --text: #f5f5f5;
@@ -24,6 +34,7 @@
     }
 }
 
+/* Reset & Base Styles */
 * {
     box-sizing: border-box;
 }
@@ -35,8 +46,10 @@ body {
     font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     background: var(--bg);
     color: var(--text);
+    line-height: 1.5;
 }
 
+/* Typography */
 h1 {
     margin-top: 0;
     margin-bottom: 12px;
@@ -48,38 +61,45 @@ h1 {
     line-height: 1.5;
 }
 
+/* Share Link Box */
 .share-box {
     background: var(--bg-secondary);
     border: 1px solid var(--border);
-    padding: 12px;
-    margin-bottom: 16px;
+    padding: 16px;
+    margin-bottom: 20px;
     border-radius: 8px;
-    word-break: break-word;
+    word-break: break-all;
 }
 
 .share-box a {
     color: inherit;
+    text-decoration: underline;
 }
 
+/* Textarea */
 textarea {
     width: 100%;
     min-height: calc(100vh - 280px);
     padding: 16px;
-    font-size: 16px; /* Prevents zoom on iOS */
-    line-height: 1.5;
+    font-size: 16px; /* Prevents iOS zoom */
+    line-height: 1.6;
     border: 1px solid var(--border);
     border-radius: 8px;
     background: var(--bg);
     color: var(--text);
     resize: vertical;
+    font-family: inherit;
 }
 
+/* Actions Bar */
 .actions {
     position: sticky;
     bottom: 0;
     background: var(--bg);
     padding-top: 12px;
-    padding-bottom: env(safe-area-inset-bottom, 0);
+    padding-bottom: env(safe-area-inset-bottom, 0); /* iOS safe area */
+    border-top: 1px solid var(--border);
+    margin-top: 16px;
 }
 
 .button-row {
@@ -88,6 +108,7 @@ textarea {
     flex-wrap: wrap;
 }
 
+/* Buttons */
 button {
     flex: 1;
     min-height: 48px;
@@ -99,12 +120,20 @@ button {
     font-size: 16px;
     font-weight: 600;
     cursor: pointer;
+    transition: background-color 0.2s ease;
 }
 
 button:hover {
     background: var(--button-hover);
 }
 
+/* Focus styles for accessibility */
+button:focus-visible {
+    outline: 3px solid #60a5fa;
+    outline-offset: 2px;
+}
+
+/* Character Counter */
 .counter {
     margin-top: 8px;
     color: var(--text-muted);
@@ -112,15 +141,17 @@ button:hover {
     text-align: right;
 }
 
+/* Responsive Adjustments */
 @media (min-width: 768px) {
     body {
         padding: 24px;
     }
-
-    button {
+    
+    .button-row button {
         flex: 0 0 auto;
+        min-width: 140px;
     }
-
+    
     textarea {
         min-height: 500px;
     }

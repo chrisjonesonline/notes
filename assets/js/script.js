@@ -8,12 +8,10 @@ const newNoteBtn = document.getElementById('newNote');
 | Character Counter
 |--------------------------------------------------------------------------
 */
-
 if (textarea && counter) {
     const update = () => {
         counter.textContent = `${textarea.value.length} / 100000`;
     };
-
     textarea.addEventListener('input', update);
     update();
 }
@@ -23,19 +21,15 @@ if (textarea && counter) {
 | Copy Share Link
 |--------------------------------------------------------------------------
 */
-
 if (copyButton) {
     copyButton.addEventListener('click', async () => {
         try {
             await navigator.clipboard.writeText(window.location.href);
-
             const old = copyButton.textContent;
             copyButton.textContent = 'Copied!';
-
             setTimeout(() => {
                 copyButton.textContent = old;
             }, 1200);
-
         } catch (e) {
             alert('Unable to copy link');
         }
@@ -47,7 +41,6 @@ if (copyButton) {
 | New Note Button (replaces inline onclick)
 |--------------------------------------------------------------------------
 */
-
 if (newNoteBtn) {
     newNoteBtn.addEventListener('click', () => {
         window.location.href = window.location.pathname;
