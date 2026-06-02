@@ -4,6 +4,17 @@ session_start();
 
 /*
 |--------------------------------------------------------------------------
+| Security Headers
+|--------------------------------------------------------------------------
+*/
+
+header('X-Robots-Tag: noindex, nofollow, noarchive, nosnippet');
+header('Referrer-Policy: no-referrer');
+header('X-Frame-Options: DENY');
+header('X-Content-Type-Options: nosniff');
+
+/*
+|--------------------------------------------------------------------------
 | Configuration
 |--------------------------------------------------------------------------
 */
@@ -145,7 +156,8 @@ $shareUrl = $id
 <?php if (!$id): ?>
 
     <!-- CREATE MODE -->
-    <h1>Create a Shared Note</h1>
+    <h1>Anonymous Cloud Notes</h1>
+	<h4>✓ Anonymous ✓ No account required ✓ Instant sharing ✓ Collaborative editing ✓ Free & <a href="https://github.com/chrisjonesonline/notes" target="_blank" rel="noopener noreferrer nofollow">Open Source</a></h4>
 
     <p class="small">
         Create a note and receive a secret editable link.
