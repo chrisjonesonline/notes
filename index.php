@@ -9,12 +9,19 @@
 session_set_cookie_params([
     'lifetime' => 0,
     'path' => '/',
-    'secure' => !empty($_SERVER['HTTPS']),
+    'secure' => (
+        !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'
+    ),
     'httponly' => true,
     'samesite' => 'Strict'
 ]);
 
 session_start();
+
+if (!isset($_SESSION['initialized'])) {
+    session_regenerate_id(true);
+    $_SESSION['initialized'] = true;
+}
 
 /*
 |--------------------------------------------------------------------------
@@ -26,7 +33,10 @@ header('X-Robots-Tag: noindex, nofollow, noarchive, nosnippet');
 header('Referrer-Policy: no-referrer');
 header('X-Frame-Options: DENY');
 header('X-Content-Type-Options: nosniff');
-header('Strict-Transport-Security: max-age=31536000; includeSubDomains; preload');
+
+if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
+    header('Strict-Transport-Security: max-age=31536000; includeSubDomains; preload');
+}
 
 header(
     "Content-Security-Policy: "
@@ -51,7 +61,10 @@ $notesDir = dirname(__DIR__) . '/storage/notes';
 $maxNoteSize = 100000; // 100 KB
 
 if (!is_dir($notesDir)) {
-    mkdir($notesDir, 0700, true);
+    if (!mkdir($notesDir, 0700, true)) {
+        http_response_code(500);
+        exit('Failed to initialize storage directory');
+    }
 }
 
 if (!isset($_SESSION['csrf'])) {
@@ -76,7 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_note'])) {
 
     $content = $_POST['content'] ?? '';
 
-    if (strlen($content) > $maxNoteSize) {
+    if (mb_strlen($content, 'UTF-8') > $maxNoteSize) {
         exit('Note exceeds maximum size.');
     }
 
@@ -118,7 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_note'])) {
 
     $content = $_POST['content'] ?? '';
 
-    if (strlen($content) > $maxNoteSize) {
+    if (mb_strlen($content, 'UTF-8') > $maxNoteSize) {
         exit('Note exceeds maximum size.');
     }
 
@@ -171,14 +184,8 @@ if ($id !== null) {
     $noteContent = $content;
 }
 
-$scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-    ? 'https'
-    : 'http';
-
 $shareUrl = $id
-    ? $baseUrl .
-      strtok($_SERVER['REQUEST_URI'], '?') .
-      '?id=' . urlencode($id)
+    ? rtrim($baseUrl, '/') . '/?id=' . urlencode($id)
     : null;
 
 ?>
@@ -263,7 +270,7 @@ $shareUrl = $id
         ><?= htmlspecialchars($noteContent, ENT_QUOTES, 'UTF-8') ?></textarea>
 
         <div class="counter" id="counter">
-            <?= strlen($noteContent) ?> / 100000
+            <?= mb_strlen($noteContent, 'UTF-8') ?> / 100000
         </div>
 
         <div class="actions">
@@ -291,3 +298,4 @@ $shareUrl = $id
 <script src="assets/js/script.js"></script>
 
 </body>
+</html>
