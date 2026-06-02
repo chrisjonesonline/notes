@@ -140,7 +140,14 @@ $shareUrlBase = $id
 
     <!-- CREATE MODE -->
     <h1>Anonymous Cloud Notes</h1>
-    
+    <h4>
+    ✓ Anonymous ✓ End-to-end encrypted ✓ Zero logging ✓ Instant sharing ✓ Collaborative editing ✓ Free & 
+    <a href="https://github.com/chrisjonesonline/notes" 
+        target="_blank" 
+        rel="noopener noreferrer nofollow">Open Source
+	</a>
+    </h4>
+	<p>Create a note and receive a secret editable link. Anyone with the link can view and edit the note.</p>
     <form method="post" id="createForm">
         <input type="hidden" name="csrf" value="<?= htmlspecialchars($_SESSION['csrf']) ?>">
         <textarea id="content" placeholder="Write your note here..."></textarea>
@@ -158,7 +165,7 @@ $shareUrlBase = $id
         <a href="<?= htmlspecialchars($shareUrlBase) ?>" id="shareLink">
             <?= htmlspecialchars($shareUrlBase) ?>#<span id="keyDisplay">[key]</span>
         </a><br><br>
-        <strong>Keep the full link (including #key) safe.</strong>
+       <strong>Keep this link safe — it is required to access this note. If lost, the note cannot be recovered.</strong><br>
     </div>
 
     <form method="post" id="editForm">
