@@ -2,6 +2,16 @@
 
 /*
 |--------------------------------------------------------------------------
+| Security Note
+|--------------------------------------------------------------------------
+| These defaults are intentionally strict.
+| Do not loosen CSP, cookie flags, or file permissions unless you
+| fully understand the security implications.
+|--------------------------------------------------------------------------
+*
+
+/*
+|--------------------------------------------------------------------------
 | Secure Session Cookies
 |--------------------------------------------------------------------------
 */
@@ -45,20 +55,29 @@ header(
     . "style-src 'self'; "
     . "img-src 'self' data:; "
     . "object-src 'none'; "
-    . "base-uri 'self'; "
+    . "base-uri 'none'; "
     . "frame-ancestors 'none'; "
-    . "form-action 'self';"
+    . "form-action 'self'; "
+    . "upgrade-insecure-requests;"   // Enforces HTTPS
 );
 
 /*
 |--------------------------------------------------------------------------
 | Configuration
+| ←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←
+| IMPORTANT: Customize these values for your own deployment!
 |--------------------------------------------------------------------------
 */
 
+// REQUIRED: Change to your own domain (used for share links)
 $baseUrl = 'https://notes.chrisjones.online';
+
+// Path to store notes
 $notesDir = dirname(__DIR__) . '/storage/notes';
-$maxNoteSize = 100000; // 100 KB
+
+// Note size limits
+$maxNoteSizeChars = 100000; // UI character limit (displayed to user)
+$maxNoteSizeBytes = 500000; // Hard byte limit (prevents storage abuse)
 
 if (!is_dir($notesDir)) {
     if (!mkdir($notesDir, 0700, true)) {
@@ -89,8 +108,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_note'])) {
 
     $content = $_POST['content'] ?? '';
 
-    if (mb_strlen($content, 'UTF-8') > $maxNoteSize) {
-        exit('Note exceeds maximum size.');
+    if (mb_strlen($content, 'UTF-8') > $maxNoteSizeChars) {
+        exit('Note exceeds maximum character limit.');
+    }
+    if (strlen($content) > $maxNoteSizeBytes) {
+        exit('Note exceeds maximum storage size.');
     }
 
     $id = bin2hex(random_bytes(16));
@@ -131,8 +153,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_note'])) {
 
     $content = $_POST['content'] ?? '';
 
-    if (mb_strlen($content, 'UTF-8') > $maxNoteSize) {
-        exit('Note exceeds maximum size.');
+    if (mb_strlen($content, 'UTF-8') > $maxNoteSizeChars) {
+        exit('Note exceeds maximum character limit.');
+    }
+    if (strlen($content) > $maxNoteSizeBytes) {
+        exit('Note exceeds maximum storage size.');
     }
 
     $file = $notesDir . '/' . $id . '.txt';
@@ -231,7 +256,7 @@ $shareUrl = $id
             placeholder="Write your note here..."
         ></textarea>
 
-        <div class="counter" id="counter">0 / 100000</div>
+        <div class="counter" id="counter">0 / 100000 characters</div>
 
         <div class="actions">
             <div class="button-row">
@@ -270,7 +295,7 @@ $shareUrl = $id
         ><?= htmlspecialchars($noteContent, ENT_QUOTES, 'UTF-8') ?></textarea>
 
         <div class="counter" id="counter">
-            <?= mb_strlen($noteContent, 'UTF-8') ?> / 100000
+            <?= mb_strlen($noteContent, 'UTF-8') ?> / 100000 characters
         </div>
 
         <div class="actions">
