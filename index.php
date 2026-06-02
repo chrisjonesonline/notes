@@ -1,5 +1,19 @@
 <?php
 
+/*
+|--------------------------------------------------------------------------
+| Secure Session Cookies
+|--------------------------------------------------------------------------
+*/
+
+session_set_cookie_params([
+    'lifetime' => 0,
+    'path' => '/',
+    'secure' => !empty($_SERVER['HTTPS']),
+    'httponly' => true,
+    'samesite' => 'Strict'
+]);
+
 session_start();
 
 /*
@@ -12,6 +26,19 @@ header('X-Robots-Tag: noindex, nofollow, noarchive, nosnippet');
 header('Referrer-Policy: no-referrer');
 header('X-Frame-Options: DENY');
 header('X-Content-Type-Options: nosniff');
+header('Strict-Transport-Security: max-age=31536000; includeSubDomains; preload');
+
+header(
+    "Content-Security-Policy: "
+    . "default-src 'self'; "
+    . "script-src 'self'; "
+    . "style-src 'self'; "
+    . "img-src 'self' data:; "
+    . "object-src 'none'; "
+    . "base-uri 'self'; "
+    . "frame-ancestors 'none'; "
+    . "form-action 'self';"
+);
 
 /*
 |--------------------------------------------------------------------------
@@ -127,7 +154,14 @@ if ($id !== null) {
         exit('Note not found');
     }
 
-    $noteContent = file_get_contents($file);
+    $content = file_get_contents($file);
+
+    if ($content === false) {
+        http_response_code(500);
+        exit('Failed to read note');
+    }
+
+    $noteContent = $content;
 }
 
 $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
@@ -147,7 +181,7 @@ $shareUrl = $id
     <meta charset="utf-8">
     <title>Anonymous Cloud Notes</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 
@@ -157,7 +191,15 @@ $shareUrl = $id
 
     <!-- CREATE MODE -->
     <h1>Anonymous Cloud Notes</h1>
-	<h4>✓ Anonymous ✓ No account required ✓ Instant sharing ✓ Collaborative editing ✓ Free & <a href="https://github.com/chrisjonesonline/notes" target="_blank" rel="noopener noreferrer nofollow">Open Source</a></h4>
+
+    <h4>
+        ✓ Anonymous ✓ No account required ✓ Instant sharing ✓ Collaborative editing ✓ Free &
+        <a href="https://github.com/chrisjonesonline/notes"
+           target="_blank"
+           rel="noopener noreferrer nofollow">
+            Open Source
+        </a>
+    </h4>
 
     <p class="small">
         Create a note and receive a secret editable link.
@@ -179,11 +221,9 @@ $shareUrl = $id
 
         <div class="actions">
             <div class="button-row">
-
                 <button type="submit" name="new_note">
                     Create Note
                 </button>
-
             </div>
         </div>
 
@@ -192,7 +232,7 @@ $shareUrl = $id
 <?php else: ?>
 
     <!-- EDIT MODE -->
-    <h1>Shared Note</h1>
+    <h1>Anonymous Cloud Notes</h1>
 
     <div class="share-box">
         <strong>Share this link:</strong><br>
@@ -229,8 +269,7 @@ $shareUrl = $id
                     Copy Link
                 </button>
 
-                <button type="button"
-                        onclick="location.href='<?= strtok($_SERVER['REQUEST_URI'], '?') ?>'">
+                <button type="button" id="newNote">
                     New Note
                 </button>
 
@@ -241,39 +280,7 @@ $shareUrl = $id
 
 <?php endif; ?>
 
-<script>
-const textarea = document.getElementById('content');
-const counter = document.getElementById('counter');
-
-if (textarea && counter) {
-    const update = () => {
-        counter.textContent = `${textarea.value.length} / 100000`;
-    };
-
-    textarea.addEventListener('input', update);
-    update();
-}
-
-const copyButton = document.getElementById('copyLink');
-
-if (copyButton) {
-    copyButton.addEventListener('click', async () => {
-        try {
-            await navigator.clipboard.writeText(window.location.href);
-
-            const old = copyButton.textContent;
-            copyButton.textContent = 'Copied!';
-
-            setTimeout(() => {
-                copyButton.textContent = old;
-            }, 1200);
-
-        } catch (e) {
-            alert('Unable to copy link');
-        }
-    });
-}
-</script>
+<script src="assets/js/script.js"></script>
 
 </body>
 </html>
