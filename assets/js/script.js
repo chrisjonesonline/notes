@@ -10,7 +10,7 @@ const newNoteBtn = document.getElementById('newNote');
 */
 if (textarea && counter) {
     const update = () => {
-        counter.textContent = `${textarea.value.length} / 100000`;
+        counter.textContent = `${textarea.value.length} / 100000 characters`;
     };
     textarea.addEventListener('input', update);
     update();

@@ -8,7 +8,7 @@
 | Do not loosen CSP, cookie flags, or file permissions unless you
 | fully understand the security implications.
 |--------------------------------------------------------------------------
-*
+*/
 
 /*
 |--------------------------------------------------------------------------
@@ -58,7 +58,7 @@ header(
     . "base-uri 'none'; "
     . "frame-ancestors 'none'; "
     . "form-action 'self'; "
-    . "upgrade-insecure-requests;"   // Enforces HTTPS
+    . "upgrade-insecure-requests;" // Enforces HTTPS
 );
 
 /*
@@ -275,7 +275,7 @@ $shareUrl = $id
 
     <div class="share-box">
         <strong>Your private link:</strong><br><br>
-        <a href="<?= htmlspecialchars($shareUrl, ENT_QUOTES, 'UTF-8') ?>">
+        <a href="<?= htmlspecialchars($shareUrl, ENT_QUOTES, 'UTF-8') ?>" id="shareLink">
             <?= htmlspecialchars($shareUrl, ENT_QUOTES, 'UTF-8') ?>
         </a><br><br>
         <strong>Keep this link safe — it is your only means of accessing this note.</strong><br>
