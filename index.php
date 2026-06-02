@@ -46,6 +46,7 @@ header(
 |--------------------------------------------------------------------------
 */
 
+$baseUrl = 'https://notes.chrisjones.online';
 $notesDir = dirname(__DIR__) . '/storage/notes';
 $maxNoteSize = 100000; // 100 KB
 
@@ -82,7 +83,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_note'])) {
     $id = bin2hex(random_bytes(16));
     $file = $notesDir . '/' . $id . '.txt';
 
-    file_put_contents($file, $content, LOCK_EX);
+    if (file_put_contents($file, $content, LOCK_EX) === false) {
+        http_response_code(500);
+        exit('Failed to save note. Please try again.');
+    }
     chmod($file, 0600);
 
     header('Location: ?id=' . urlencode($id));
@@ -125,7 +129,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_note'])) {
         exit('Note not found');
     }
 
-    file_put_contents($file, $content, LOCK_EX);
+    if (file_put_contents($file, $content, LOCK_EX) === false) {
+        http_response_code(500);
+        exit('Failed to save note. Please try again.');
+    }
 
     header('Location: ?id=' . urlencode($id));
     exit;
@@ -169,7 +176,7 @@ $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
     : 'http';
 
 $shareUrl = $id
-    ? $scheme . '://' . $_SERVER['HTTP_HOST'] .
+    ? $baseUrl .
       strtok($_SERVER['REQUEST_URI'], '?') .
       '?id=' . urlencode($id)
     : null;
@@ -239,7 +246,7 @@ $shareUrl = $id
         <a href="<?= htmlspecialchars($shareUrl, ENT_QUOTES, 'UTF-8') ?>">
             <?= htmlspecialchars($shareUrl, ENT_QUOTES, 'UTF-8') ?>
         </a><br><br>
-        <strong>Keep this link safe — it is your only means of accessing this note.<br>
+        <strong>Keep this link safe — it is your only means of accessing this note.</strong><br>
     </div>
 
     <form method="post">
