@@ -1,5 +1,4 @@
 <?php
-
 /*
 |--------------------------------------------------------------------------
 | Security Note
@@ -7,12 +6,6 @@
 | These defaults are intentionally strict.
 | Do not loosen CSP, cookie flags, or file permissions unless you
 | fully understand the security implications.
-|--------------------------------------------------------------------------
-*/
-
-/*
-|--------------------------------------------------------------------------
-| Secure Session Cookies
 |--------------------------------------------------------------------------
 */
 
@@ -31,28 +24,13 @@ if (!isset($_SESSION['initialized'])) {
     $_SESSION['initialized'] = true;
 }
 
-/*
-|--------------------------------------------------------------------------
-| Security Headers
-|--------------------------------------------------------------------------
-*/
-
+/* Security Headers */
 header('X-Robots-Tag: noindex, nofollow, noarchive, nosnippet');
 header('X-Frame-Options: DENY');
 header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self';");
 
-/*
-|--------------------------------------------------------------------------
-| Configuration
-| ←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←
-| IMPORTANT: Customize these values for your own deployment!
-|--------------------------------------------------------------------------
-*/
-
-// REQUIRED: Change to your own domain
+/* Configuration */
 $baseUrl = 'https://notes.chrisjones.online';
-
-// Storage directory for encrypted notes
 $notesDir = dirname(__DIR__) . '/storage/notes';
 
 if (!is_dir($notesDir)) {
@@ -63,25 +41,14 @@ if (!isset($_SESSION['csrf'])) {
     $_SESSION['csrf'] = bin2hex(random_bytes(32));
 }
 
-/*
-|--------------------------------------------------------------------------
-| Handle POST Requests (Create or Save)
-|--------------------------------------------------------------------------
-| Note: Actual encryption happens in the browser (script.js)
-| Server only stores ciphertext.
-|--------------------------------------------------------------------------
-*/
-
+/* POST Handler */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
     if (!hash_equals($_SESSION['csrf'], $_POST['csrf'] ?? '')) {
         http_response_code(403);
         exit('CSRF error');
     }
 
     $content = $_POST['content'] ?? '';
-    
-    // Basic server-side size limit (ciphertext)
     if (strlen($content) > 500000) {
         http_response_code(413);
         exit('Note too large');
@@ -93,7 +60,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     file_put_contents($file, $content, LOCK_EX);
     chmod($file, 0600);
 
-    // AJAX response for new notes (used by JS to append #key)
     if (isset($_POST['ajax'])) {
         header('Content-Type: application/json');
         echo json_encode(['success' => true, 'id' => $id]);
@@ -104,12 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
-/*
-|--------------------------------------------------------------------------
-| Load Existing Note
-|--------------------------------------------------------------------------
-*/
-
+/* Load Note */
 $id = $_GET['id'] ?? null;
 $noteContent = '';
 
@@ -123,7 +84,6 @@ if ($id && preg_match('/^[a-f0-9]{32}$/', $id)) {
 $shareUrlBase = $id 
     ? rtrim($baseUrl, '/') . '/?id=' . urlencode($id) 
     : null;
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -137,23 +97,23 @@ $shareUrlBase = $id
 <body>
 
 <?php if (!$id): ?>
-
     <!-- CREATE MODE -->
     <h1>Anonymous Cloud Notes</h1>
-    <h4>
-    ✓ Anonymous ✓ End-to-end encrypted ✓ Instant sharing ✓ Collaborative editing ✓ Free & 
-    <a href="https://github.com/chrisjonesonline/notes" 
-        target="_blank" 
-        rel="noopener noreferrer nofollow">Open Source</a>
-    </h4>
-	<p>Create a note and receive a secret editable link. Anyone with the link can view and edit the note.</p>
+    
+    <p class="tagline">
+        ✓ Anonymous ✓ End-to-end encrypted ✓ Instant sharing ✓ Collaborative editing ✓ Free & 
+        <a href="https://github.com/chrisjonesonline/notes" target="_blank" rel="noopener noreferrer nofollow">Open Source</a>
+    </p>
+
+    <p class="description">
+        Create a note and receive a secret editable link. Anyone with the link can view and edit the note.
+    </p>
 
     <form method="post" id="createForm">
         <input type="hidden" name="csrf" value="<?= htmlspecialchars($_SESSION['csrf']) ?>">
         <textarea id="content" placeholder="Write your note here..."></textarea>
         <div class="counter" id="counter">0 / 100000 characters</div>
         
-        <!-- Button container for consistent mobile styling -->
         <div class="actions">
             <div class="button-row">
                 <button type="submit" name="new_note">Create Encrypted Note</button>
@@ -162,15 +122,18 @@ $shareUrlBase = $id
     </form>
 
 <?php else: ?>
-
     <!-- EDIT / VIEW MODE -->
     <h1>Anonymous Cloud Notes</h1>
+    
     <div class="share-box">
-        <strong>Your private link:</strong><br><br>
-        <a href="<?= htmlspecialchars($shareUrlBase) ?>" id="shareLink">
+        <p class="share-title">Your private link:</p>
+        <a href="#" id="shareLink">
             <?= htmlspecialchars($shareUrlBase) ?>#<span id="keyDisplay">[key]</span>
-        </a><br><br>
-       <strong>Keep this link safe — it is required to access this note. If lost, the note cannot be recovered.</strong><br>
+        </a>
+        <p class="share-warning">
+            Keep this link safe — it is required to access this note. 
+            If lost, the note cannot be recovered.
+        </p>
     </div>
 
     <form method="post" id="editForm">
@@ -178,13 +141,10 @@ $shareUrlBase = $id
         <input type="hidden" name="id" value="<?= htmlspecialchars($id) ?>">
 
         <textarea id="content"></textarea>
-        
-        <!-- Hidden field containing encrypted data -->
         <input type="hidden" id="encryptedData" value="<?= htmlspecialchars($noteContent) ?>">
         
         <div class="counter" id="counter">0 / 100000 characters</div>
         
-        <!-- Button container for proper styling -->
         <div class="actions">
             <div class="button-row">
                 <button type="submit" name="save_note">Save</button>
@@ -193,10 +153,8 @@ $shareUrlBase = $id
             </div>
         </div>
     </form>
-
 <?php endif; ?>
 
 <script src="assets/js/script.js"></script>
-
 </body>
 </html>

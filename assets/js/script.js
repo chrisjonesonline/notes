@@ -146,6 +146,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    /* Fix share link to include full URL with #key */
+    const shareLink = document.getElementById('shareLink');
+    if (shareLink && key) {
+        shareLink.href = location.href;
+    }
+
     /* Form Submission Handler */
     form.addEventListener('submit', async (e) => {
         if (form.dataset.submitting === 'true') return;
