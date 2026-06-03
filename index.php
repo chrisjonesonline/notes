@@ -141,13 +141,13 @@ $shareUrlBase = $id
     <!-- CREATE MODE -->
     <h1>Anonymous Cloud Notes</h1>
     <h4>
-    ✓ Anonymous ✓ End-to-end encrypted ✓ Zero logging ✓ Instant sharing ✓ Collaborative editing ✓ Free & 
+    ✓ Anonymous ✓ End-to-end encrypted ✓ Instant sharing ✓ Collaborative editing ✓ Free & 
     <a href="https://github.com/chrisjonesonline/notes" 
         target="_blank" 
-        rel="noopener noreferrer nofollow">Open Source
-	</a>
+        rel="noopener noreferrer nofollow">Open Source</a>
     </h4>
 	<p>Create a note and receive a secret editable link. Anyone with the link can view and edit the note.</p>
+
     <form method="post" id="createForm">
         <input type="hidden" name="csrf" value="<?= htmlspecialchars($_SESSION['csrf']) ?>">
         <textarea id="content" placeholder="Write your note here..."></textarea>
@@ -159,7 +159,12 @@ $shareUrlBase = $id
 
     <!-- EDIT / VIEW MODE -->
     <h1>Anonymous Cloud Notes</h1>
-    
+    <h4>
+    ✓ Anonymous ✓ End-to-end encrypted ✓ Instant sharing ✓ Collaborative editing ✓ Free & 
+    <a href="https://github.com/chrisjonesonline/notes" 
+        target="_blank" 
+        rel="noopener noreferrer nofollow">Open Source</a>
+    </h4>
     <div class="share-box">
         <strong>Your private link:</strong><br><br>
         <a href="<?= htmlspecialchars($shareUrlBase) ?>" id="shareLink">
@@ -171,6 +176,7 @@ $shareUrlBase = $id
     <form method="post" id="editForm">
         <input type="hidden" name="csrf" value="<?= htmlspecialchars($_SESSION['csrf']) ?>">
         <input type="hidden" name="id" value="<?= htmlspecialchars($id) ?>">
+
         <textarea id="content"></textarea>
         
         <!-- Hidden field containing encrypted data -->
@@ -178,9 +184,14 @@ $shareUrlBase = $id
         
         <div class="counter" id="counter">0 / 100000 characters</div>
         
-        <button type="submit" name="save_note">Save Changes</button>
-        <button type="button" id="copyLink">Copy Link</button>
-        <button type="button" id="newNote">New Note</button>
+        <!-- Button container for proper styling -->
+        <div class="actions">
+            <div class="button-row">
+                <button type="submit" name="save_note">Save Changes</button>
+                <button type="button" id="copyLink">Copy Link</button>
+                <button type="button" id="newNote">New Note</button>
+            </div>
+        </div>
     </form>
 
 <?php endif; ?>
