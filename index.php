@@ -15,7 +15,6 @@
 | Secure Session Cookies
 |--------------------------------------------------------------------------
 */
-
 session_set_cookie_params([
     'lifetime' => 0,
     'path' => '/',
@@ -36,7 +35,6 @@ if (!isset($_SESSION['initialized'])) {
 | Security Headers
 |--------------------------------------------------------------------------
 */
-
 header('Content-Type: text/html; charset=utf-8');
 header('X-Robots-Tag: noindex, nofollow, noarchive, nosnippet');
 header('X-Frame-Options: DENY');
@@ -53,6 +51,7 @@ header(
     "default-src 'self'; " .
     "script-src 'self'; " .
     "style-src 'self'; " .
+    "connect-src 'self'; " .          // Added for AJAX/fetch requests
     "object-src 'none'; " .
     "base-uri 'none'; " .
     "frame-ancestors 'none'; " .
@@ -64,7 +63,6 @@ header(
 | Configuration
 |--------------------------------------------------------------------------
 */
-
 $baseUrl = 'https://notes.chrisjones.online';
 $notesDir = dirname(__DIR__) . '/storage/notes';
 
@@ -87,7 +85,6 @@ if (!isset($_SESSION['csrf'])) {
 | Server only stores ciphertext.
 |--------------------------------------------------------------------------
 */
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (!hash_equals($_SESSION['csrf'], $_POST['csrf'] ?? '')) {
@@ -96,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $content = $_POST['content'] ?? '';
-    
+   
     if (strlen($content) > 500000) {
         http_response_code(413);
         exit('Note too large');
@@ -110,7 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $file = $notesDir . '/' . $id . '.txt';
-    
+   
     if (file_put_contents($file, $content, LOCK_EX) === false) {
         http_response_code(500);
         exit('Failed to save note');
@@ -134,7 +131,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 | Load Existing Note
 |--------------------------------------------------------------------------
 */
-
 $id = $_GET['id'] ?? null;
 $noteContent = '';
 
@@ -145,8 +141,8 @@ if ($id && preg_match('/^[a-f0-9]{32}$/', $id)) {
     }
 }
 
-$shareUrlBase = $id 
-    ? rtrim($baseUrl, '/') . '/?id=' . urlencode($id) 
+$shareUrlBase = $id
+    ? rtrim($baseUrl, '/') . '/?id=' . urlencode($id)
     : null;
 
 ?>
@@ -158,17 +154,16 @@ $shareUrlBase = $id
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
-
 <body>
 
 <?php if (!$id): ?>
     <!-- CREATE MODE -->
     <h1>Anonymous Cloud Notes</h1>
-    
+   
     <p class="tagline">
-        ✓ Anonymous ✓ End-to-end encrypted ✓ No tracking ✓ Instant sharing ✓ Collaborative editing ✓ Free & 
-        <a href="https://github.com/chrisjonesonline/notes" 
-           target="_blank" 
+        ✓ Anonymous ✓ End-to-end encrypted ✓ No tracking ✓ Instant sharing ✓ Collaborative editing ✓ Free &
+        <a href="https://github.com/chrisjonesonline/notes"
+           target="_blank"
            rel="noopener noreferrer nofollow">Open Source</a>
     </p>
 
@@ -178,15 +173,15 @@ $shareUrlBase = $id
 
     <form method="post" id="createForm">
         <input type="hidden" name="csrf" value="<?= htmlspecialchars($_SESSION['csrf'], ENT_QUOTES, 'UTF-8') ?>">
-        <textarea 
-            id="content" 
+        <textarea
+            id="content"
             placeholder="Write your note here..."
             autocomplete="off"
             autocapitalize="off"
             spellcheck="false"
             aria-label="Note content"></textarea>
         <div class="counter" id="counter">0 / 100000 characters</div>
-        
+       
         <div class="actions">
             <div class="button-row">
                 <button type="submit" name="new_note">Create Encrypted Note</button>
@@ -197,14 +192,14 @@ $shareUrlBase = $id
 <?php else: ?>
     <!-- EDIT / VIEW MODE -->
     <h1>Anonymous Cloud Notes</h1>
-    
+   
     <div class="share-box">
         <p class="share-title">Your private link:</p>
         <a href="#" id="shareLink">
             <?= htmlspecialchars($shareUrlBase, ENT_QUOTES, 'UTF-8') ?>#<span id="keyDisplay">[key]</span>
         </a>
         <p class="share-warning">
-            Keep this link safe — it is required to access this note. 
+            Keep this link safe — it is required to access this note.
             If lost, the note cannot be recovered.
         </p>
     </div>
@@ -212,17 +207,16 @@ $shareUrlBase = $id
     <form method="post" id="editForm">
         <input type="hidden" name="csrf" value="<?= htmlspecialchars($_SESSION['csrf'], ENT_QUOTES, 'UTF-8') ?>">
         <input type="hidden" name="id" value="<?= htmlspecialchars($id, ENT_QUOTES, 'UTF-8') ?>">
-
-        <textarea 
+        <textarea
             id="content"
             autocomplete="off"
             autocapitalize="off"
             spellcheck="false"
             aria-label="Note content"></textarea>
         <input type="hidden" id="encryptedData" value="<?= htmlspecialchars($noteContent, ENT_QUOTES, 'UTF-8') ?>">
-        
+       
         <div class="counter" id="counter">0 / 100000 characters</div>
-        
+       
         <div class="actions">
             <div class="button-row">
                 <button type="submit" name="save_note">Save</button>
