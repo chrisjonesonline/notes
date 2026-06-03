@@ -118,6 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     chmod($file, 0600);
 
+    // More explicit AJAX check
     if (($_POST['ajax'] ?? '') === '1') {
         header('Content-Type: application/json; charset=utf-8');
         echo json_encode(['success' => true, 'id' => $id]);
