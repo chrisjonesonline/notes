@@ -159,12 +159,6 @@ $shareUrlBase = $id
 
     <!-- EDIT / VIEW MODE -->
     <h1>Anonymous Cloud Notes</h1>
-    <h4>
-    ✓ Anonymous ✓ End-to-end encrypted ✓ Instant sharing ✓ Collaborative editing ✓ Free & 
-    <a href="https://github.com/chrisjonesonline/notes" 
-        target="_blank" 
-        rel="noopener noreferrer nofollow">Open Source</a>
-    </h4>
     <div class="share-box">
         <strong>Your private link:</strong><br><br>
         <a href="<?= htmlspecialchars($shareUrlBase) ?>" id="shareLink">
@@ -187,7 +181,7 @@ $shareUrlBase = $id
         <!-- Button container for proper styling -->
         <div class="actions">
             <div class="button-row">
-                <button type="submit" name="save_note">Save Changes</button>
+                <button type="submit" name="save_note">Save</button>
                 <button type="button" id="copyLink">Copy Link</button>
                 <button type="button" id="newNote">New Note</button>
             </div>

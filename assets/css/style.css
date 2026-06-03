@@ -4,11 +4,10 @@
 |--------------------------------------------------------------------------
 | Modern, minimal, and accessible design with light/dark mode support.
 | Feel free to customize colors and layout for your own fork.
-|-------------------------------------------------------------------------- 
+|--------------------------------------------------------------------------
 */
 
 :root {
-    /* Light mode defaults */
     color-scheme: light dark;
     --bg: #ffffff;
     --bg-secondary: #f5f5f5;
@@ -22,7 +21,6 @@
 
 @media (prefers-color-scheme: dark) {
     :root {
-        /* Dark mode colors */
         --bg: #121212;
         --bg-secondary: #1e1e1e;
         --text: #f5f5f5;
@@ -47,8 +45,6 @@ body {
     background: var(--bg);
     color: var(--text);
     line-height: 1.5;
-
-    /* Flex layout for proper sticky footer */
     display: flex;
     flex-direction: column;
     min-height: 100vh;
@@ -58,12 +54,6 @@ body {
 h1, h4 {
     margin-top: 0;
     margin-bottom: 12px;
-}
-
-.small {
-    color: var(--text-muted);
-    font-size: 14px;
-    line-height: 1.5;
 }
 
 /* Share Link Box */
@@ -81,19 +71,19 @@ h1, h4 {
     text-decoration: underline;
 }
 
-/* Form - Allows textarea to grow */
+/* Form */
 form {
     display: flex;
     flex-direction: column;
     flex: 1;
 }
 
-/* Textarea - Grows to fill available space */
+/* Textarea */
 textarea {
     flex: 1;
     min-height: 300px;
     padding: 16px;
-    font-size: 16px; /* Prevents iOS zoom */
+    font-size: 16px;
     line-height: 1.6;
     border: 1px solid var(--border);
     border-radius: 8px;
@@ -103,16 +93,15 @@ textarea {
     font-family: inherit;
 }
 
-/* Actions Bar - Sticky centered footer */
+/* Actions Bar */
 .actions {
     position: sticky;
     bottom: 0;
     width: 100%;
     background: var(--bg);
     border-top: 1px solid var(--border);
-    padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0));
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0));
     margin-top: 16px;
-    
     display: flex;
     justify-content: center;
 }
@@ -128,38 +117,56 @@ textarea {
     flex-wrap: wrap;
 }
 
-/* Base Button Styles */
+/* Buttons */
 button {
-    min-height: 48px;
-    padding: 12px 18px;
+    min-height: 46px;
+    padding: 10px 16px;
     border: none;
     border-radius: 8px;
     background: var(--button);
     color: var(--button-text);
-    font-size: 16px;
+    font-size: 15.5px;
     font-weight: 600;
     cursor: pointer;
     transition: background-color 0.2s ease;
+    flex: 1;
+    min-width: 110px;
 }
 
 button:hover {
     background: var(--button-hover);
 }
 
-/* Button sizing inside row */
-.button-row button {
-    flex: 0 1 180px;
-    max-width: 220px;
-    min-width: 140px;
+/* Larger screens */
+@media (min-width: 640px) {
+    .button-row button {
+        flex: 0 1 auto;
+        min-width: 135px;
+        max-width: 170px;
+        padding: 11px 18px;
+    }
 }
 
-/* Focus styles for accessibility */
+/* Very small mobile screens - more compact */
+@media (max-width: 480px) {
+    button {
+        min-height: 44px;
+        padding: 9px 14px;
+        font-size: 15px;
+    }
+    
+    .button-row {
+        gap: 8px;
+    }
+}
+
+/* Focus styles */
 button:focus-visible {
     outline: 3px solid #60a5fa;
     outline-offset: 2px;
 }
 
-/* Character Counter */
+/* Counter */
 .counter {
     margin-top: 8px;
     color: var(--text-muted);
@@ -167,17 +174,11 @@ button:focus-visible {
     text-align: right;
 }
 
-/* Responsive Adjustments */
+/* General Responsive */
 @media (min-width: 768px) {
     body {
         padding: 24px;
     }
-    
-    .button-row button {
-        flex: 0 0 auto;
-        min-width: 160px;
-    }
-    
     textarea {
         min-height: 500px;
     }
