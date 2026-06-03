@@ -4,7 +4,7 @@
 |--------------------------------------------------------------------------
 | Modern, minimal, and accessible design with light/dark mode support.
 | Feel free to customize colors and layout for your own fork.
-|--------------------------------------------------------------------------
+|-------------------------------------------------------------------------- 
 */
 
 :root {
@@ -47,10 +47,15 @@ body {
     background: var(--bg);
     color: var(--text);
     line-height: 1.5;
+
+    /* Flex layout for proper sticky footer */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
 /* Typography */
-h1 {
+h1, h4 {
     margin-top: 0;
     margin-bottom: 12px;
 }
@@ -76,10 +81,17 @@ h1 {
     text-decoration: underline;
 }
 
-/* Textarea */
+/* Form - Allows textarea to grow */
+form {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+/* Textarea - Grows to fill available space */
 textarea {
-    width: 100%;
-    min-height: calc(100vh - 280px);
+    flex: 1;
+    min-height: 300px;
     padding: 16px;
     font-size: 16px; /* Prevents iOS zoom */
     line-height: 1.6;
@@ -91,26 +103,33 @@ textarea {
     font-family: inherit;
 }
 
-/* Actions Bar */
+/* Actions Bar - Sticky centered footer */
 .actions {
     position: sticky;
     bottom: 0;
+    width: 100%;
     background: var(--bg);
-    padding-top: 12px;
-    padding-bottom: env(safe-area-inset-bottom, 0); /* iOS safe area */
     border-top: 1px solid var(--border);
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0));
     margin-top: 16px;
+    
+    display: flex;
+    justify-content: center;
 }
 
+/* Button Row */
 .button-row {
+    width: 100%;
+    max-width: 900px;
     display: flex;
+    justify-content: center;
+    align-items: center;
     gap: 10px;
     flex-wrap: wrap;
 }
 
-/* Buttons */
+/* Base Button Styles */
 button {
-    flex: 1;
     min-height: 48px;
     padding: 12px 18px;
     border: none;
@@ -125,6 +144,13 @@ button {
 
 button:hover {
     background: var(--button-hover);
+}
+
+/* Button sizing inside row */
+.button-row button {
+    flex: 0 1 180px;
+    max-width: 220px;
+    min-width: 140px;
 }
 
 /* Focus styles for accessibility */
@@ -149,7 +175,7 @@ button:focus-visible {
     
     .button-row button {
         flex: 0 0 auto;
-        min-width: 140px;
+        min-width: 160px;
     }
     
     textarea {
