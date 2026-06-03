@@ -22,12 +22,12 @@ Even if the server is compromised or subpoenaed, it only contains encrypted data
 - Losing the link makes the note **permanently unrecoverable**
 - Collaboration is trust-based — anyone with the link can edit, and the last save wins (no version history or conflict resolution)
 - The link should only be shared through secure channels (e.g. Signal, encrypted email, or in-person)
-- Encryption protects note content, **not** metadata. The server can still see note IDs, access times, and IP addresses. Use a VPN or Tor for better privacy.
-- Browser security matters. Malicious **extensions** or **compromised devices** can access plaintext before encryption or after decryption.
+- Encryption protects note content, **not** metadata. The server can still see note IDs, access times, and IP addresses. Use a VPN or Tor for better privacy
+- Browser security matters. Malicious **extensions** or **compromised devices** can access plaintext before encryption or after decryption
+- No rate limiting. Don't be an asshole and create 1,000,000 notes
 
 ### Additional Privacy & Security Protections
 The application includes standard security hardening against common web attacks:
-
 - **Strict CSP** — Protection against XSS attacks
 - **CSRF Protection** — Prevents cross-site request forgery
 - **Clickjacking Protection** — Via X-Frame-Options and CSP frame-ancestors
