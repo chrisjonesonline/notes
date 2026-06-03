@@ -6,7 +6,7 @@ Create a note → get a secret link. Anyone with the link can view and edit it. 
 
 ### Features
 
-- True end-to-end encryption (server never sees plaintext)
+- True end-to-end encryption (server never sees plaintext or key)
 - Fully anonymous — no signup or email required
 - Real-time collaborative editing
 - Self-hosted and open source
