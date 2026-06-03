@@ -8,7 +8,7 @@ Create a note → get a secret link. Anyone with the link can view and edit it i
 ### Features
 - True end-to-end encryption (server never sees plaintext or key)
 - Fully anonymous — no signup or email required
-- Real-time collaborative editing
+- Collaborative editing
 - Self-hosted and open source
 - Clean, mobile-friendly interface
 
@@ -20,6 +20,8 @@ Even if the server is compromised or subpoenaed, it only contains encrypted data
 #### Important Notes
 - The full link is both the access token **and** decryption key
 - Losing the link makes the note **permanently unrecoverable**
+- **Overwrites are possible** — if multiple people edit at the same time, the last save wins (no version history or conflict resolution)
+- The link should only be shared through secure channels (e.g. Signal, encrypted email, or in-person)
 - Collaboration is trust-based — anyone with the link can edit
 - Encryption protects content, **not** metadata. The server can still see note IDs, access times, and IP addresses. Use a VPN or Tor for better privacy.
 - **Browser security matters.** Malicious extensions or compromised devices can access plaintext before encryption or after decryption.
