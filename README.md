@@ -22,9 +22,9 @@ Even if the server is compromised or subpoenaed, it only contains encrypted data
 - Losing the link makes the note **permanently unrecoverable**
 - Collaboration is trust-based — anyone with the link can edit, and the last save wins (no version history or conflict resolution)
 - The link should only be shared through secure channels (e.g. Signal, encrypted email, or in-person)
-- Encryption protects note content, **not** metadata. The server can still see note IDs, access times, and IP addresses. Use a VPN or Tor for better privacy
-- Browser security matters. Malicious **extensions** or **compromised devices** can access plaintext before encryption or after decryption
-- No rate limiting. Don't be an asshole and create 1,000,000 notes
+- Encryption protects note content, **not** metadata. The server can still see note IDs, access times, and IP addresses. Use a VPN or Tor for better privacy.
+- Browser security matters. Malicious **extensions** or **compromised devices** can access plaintext before encryption or after decryption.
+- No rate limiting. Don't be an asshole and create 1,000,000 notes.
 
 ### Additional Privacy & Security Protections
 The application includes standard security hardening against common web attacks:
@@ -38,6 +38,13 @@ The application includes standard security hardening against common web attacks:
 - **robots.txt + meta tags** — Prevents search engine indexing
 - **Input validation & output encoding** — Prevents malformed input and reduces injection and abuse risks
 - **Secure PHP config** — Disables error reporting in production; serves all assets locally
+
+### Self-Hosting (Easy)
+1. Put the files in your website directory
+2. Create a `storage/notes/` folder outside your website directory and make sure the server can read and write to it
+3. Change `$baseUrl` to your domain name in `index.php`
+4. Turn on HTTPS (so your site is secure)
+5. Done
 
 **Try it:** [https://notes.chrisjones.online](https://notes.chrisjones.online)
 
