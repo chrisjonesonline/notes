@@ -165,7 +165,7 @@ $shareUrlBase = $id
     <h1>Anonymous Cloud Notes</h1>
     
     <p class="tagline">
-        ✓ Anonymous ✓ End-to-end encrypted ✓ Instant sharing ✓ Collaborative editing ✓ Free & 
+        ✓ Anonymous ✓ End-to-end encrypted ✓ No tracking ✓ Instant sharing ✓ Collaborative editing ✓ Free & 
         <a href="https://github.com/chrisjonesonline/notes" 
            target="_blank" 
            rel="noopener noreferrer nofollow">Open Source</a>
