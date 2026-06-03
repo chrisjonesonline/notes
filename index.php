@@ -152,7 +152,13 @@ $shareUrlBase = $id
         <input type="hidden" name="csrf" value="<?= htmlspecialchars($_SESSION['csrf']) ?>">
         <textarea id="content" placeholder="Write your note here..."></textarea>
         <div class="counter" id="counter">0 / 100000 characters</div>
-        <button type="submit" name="new_note">Create Encrypted Note</button>
+        
+        <!-- Button container for consistent mobile styling -->
+        <div class="actions">
+            <div class="button-row">
+                <button type="submit" name="new_note">Create Encrypted Note</button>
+            </div>
+        </div>
     </form>
 
 <?php else: ?>
