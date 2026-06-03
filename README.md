@@ -8,6 +8,7 @@ Create a note → get a secret link. Anyone with the link can view and edit it. 
 ### Features
 - True end-to-end encryption (server never sees plaintext or key)
 - Fully anonymous — no signup or email required
+- Cryptographically secure random note IDs and encryption keys
 - Collaborative editing
 - Self-hosted and open source
 - Clean, mobile-friendly interface
@@ -24,7 +25,6 @@ Even if the server is compromised or subpoenaed, it only contains encrypted data
 - The link should only be shared through secure channels (e.g. Signal, encrypted email, or in-person)
 - Encryption protects note content, **not** metadata. The server can still see note IDs, access times, and IP addresses. Use a VPN or Tor for better privacy.
 - Browser security matters. Malicious **extensions** or **compromised devices** can access plaintext before encryption or after decryption.
-- No rate limiting. Don't be an asshole and create 1,000,000 notes.
 
 ### Additional Privacy & Security Protections
 The application includes standard security hardening against common web attacks:
@@ -47,5 +47,7 @@ The application includes standard security hardening against common web attacks:
 5. Done
 
 **Try it:** [https://notes.chrisjones.online](https://notes.chrisjones.online)
+
+**Note:** The above site is a public demo. Notes saved on our servers may be deleted without prior notice at any time in the event of an asshole filling up our storage needlessly. For the best experience, self-host your own copy.
 
 Made with ❤️ for privacy.
