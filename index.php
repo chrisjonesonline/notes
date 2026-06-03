@@ -46,6 +46,7 @@ header('Cache-Control: no-store, no-cache, must-revalidate');
 header('Pragma: no-cache');
 header('Expires: 0');
 header('Permissions-Policy: geolocation=(), microphone=(), camera=()');
+header('Strict-Transport-Security: max-age=31536000; includeSubDomains');
 
 header(
     "Content-Security-Policy: " .
@@ -117,7 +118,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     chmod($file, 0600);
 
-    // More explicit AJAX check
     if (($_POST['ajax'] ?? '') === '1') {
         header('Content-Type: application/json; charset=utf-8');
         echo json_encode(['success' => true, 'id' => $id]);
