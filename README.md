@@ -45,10 +45,11 @@ The application includes standard security hardening against common web attacks:
 
 ### Self-Hosting (Easy)
 1. Put the files in your website directory
-2. Create a `storage/notes/` folder outside your website directory and make sure the server can read and write to it
-3. Change `$baseUrl` to your domain name in `index.php`
-4. Turn on HTTPS (so your site is secure)
-5. Done
+2. Create a `storage/notes/` folder outside your website directory with read and write permissions
+3. (Optional but recommended) Create a `storage/rate_limits/` folder with read and write permissions
+4. Change `$baseUrl` to your domain name in `index.php`
+5. Turn on HTTPS (so your site is secure)
+6. Done
 
 **Try it:** [https://notes.chrisjones.online](https://notes.chrisjones.online)
 
