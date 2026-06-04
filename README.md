@@ -10,8 +10,8 @@ Create a note → get a secret link. Anyone with the link can view and edit it. 
 - Fully anonymous — no signup or email required
 - Cryptographically secure random note IDs and encryption keys
 - Collaborative editing
-- Automatic cleanup removes notes inactive for 30+ days
-- Hardened rate limiting and abuse protection
+- Hardened rate limiting (1 note per hour per IP)
+- Automatic cleanup deletes notes not modified for 30+ days (Probabilistic)
 - Strict security headers and secure session handling
 - Secure file storage with restricted permissions
 - Self-hosted and open source
