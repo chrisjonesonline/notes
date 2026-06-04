@@ -1,7 +1,7 @@
 # Anonymous Cloud Notes
 
 **A minimalist, end-to-end encrypted collaborative notepad.**  
-No accounts. No tracking. No bullshit.
+No accounts. Privacy-first. No bullshit.
 
 Create a note → get a secret link. Anyone with the link can view and edit it. Notes are encrypted in your browser using **AES-256-GCM** before reaching the server.
 
@@ -42,6 +42,7 @@ The application includes standard security hardening against common web attacks:
 - **robots.txt + meta tags** — Prevents search engine indexing
 - **Input validation & output encoding** — Prevents malformed input and reduces injection and abuse risks
 - **Secure PHP config** — Disables error reporting in production; serves all assets locally
+- **Ephemeral rate-limit metadata** — Hashed IP-based rate-limiting data is used only for abuse prevention and is automatically deleted after 2 hours (Probabilistically). It is not used for tracking, profiling, or analytics.
 
 ### Self-Hosting (Easy)
 1. Put the files in your website directory
