@@ -110,7 +110,7 @@ function cleanupOldNotes($notesDir) {
 |--------------------------------------------------------------------------
 */
 function cleanupRateLimits($limitDir) {
-    $threshold = time() - (8 * 60 * 60); // 8 hours
+    $threshold = time() - (2 * 60 * 60); // 2 hours
 
     if (!is_dir($limitDir)) return;
 
