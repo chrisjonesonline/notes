@@ -11,7 +11,7 @@ Create a note → get a secret link. Anyone with the link can view and edit it. 
 - Cryptographically secure random note IDs and encryption keys
 - Collaborative editing
 - Hardened rate limiting (1 note per hour per IP)
-- Automatic cleanup deletes notes not modified for 30+ days (Probabilistic)
+- Automatic cleanup deletes notes not modified for 30+ days (Probabilistically)
 - Strict security headers and secure session handling
 - Secure file storage with restricted permissions
 - Self-hosted and open source
