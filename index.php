@@ -89,7 +89,7 @@ if (!isset($_SESSION['csrf'])) {
 
 /*
 |--------------------------------------------------------------------------
-| Automatic Cleanup: Delete notes not accessed in 30+ days (Probabilistic)
+| Automatic cleanup deletes notes not accessed for 30+ days (Probabilistic)
 |--------------------------------------------------------------------------
 */
 function cleanupOldNotes($notesDir) {
@@ -110,7 +110,7 @@ if (random_int(1, 100) === 1) {
 
 /*
 |--------------------------------------------------------------------------
-| Rate Limiting (1 note per hour per IP) - Fully Hardened
+| Hardened Rate Limiting (1 note per hour per IP)
 |--------------------------------------------------------------------------
 */
 function checkRateLimit() {
