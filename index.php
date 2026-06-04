@@ -69,10 +69,10 @@ header(
 
 /*
 |--------------------------------------------------------------------------
-| Configuration - CHANGE THESE FOR SELF-HOSTING
+| Configuration - CHANGE FOR SELF-HOSTING
 |--------------------------------------------------------------------------
 */
-$baseUrl = 'https://notes.chrisjones.online';   // ←←← CHANGE TO YOUR DOMAIN
+$baseUrl = 'https://notes.chrisjones.online';   // ← CHANGE TO YOUR DOMAIN
 
 $notesDir = dirname(__DIR__) . '/storage/notes';
 
@@ -91,11 +91,9 @@ if (!isset($_SESSION['csrf'])) {
 |--------------------------------------------------------------------------
 | Automatic Cleanup: Delete notes not accessed in 30+ days (Probabilistic)
 |--------------------------------------------------------------------------
-| Runs on ~1% of requests to keep performance impact minimal.
-|--------------------------------------------------------------------------
 */
 function cleanupOldNotes($notesDir) {
-    $threshold = time() - (30 * 24 * 60 * 60); // 30 days
+    $threshold = time() - (30 * 24 * 60 * 60);
     if (!is_dir($notesDir)) return;
 
     foreach (glob($notesDir . '/*.txt') as $file) {
@@ -121,9 +119,7 @@ function checkRateLimit() {
     $limitFile = $limitDir . '/' . md5($ip) . '.json';
     
     if (!is_dir($limitDir)) {
-        if (!mkdir($limitDir, 0700, true)) {
-            return;
-        }
+        if (!mkdir($limitDir, 0700, true)) return;
     }
 
     $fp = fopen($limitFile, 'c+');
@@ -276,7 +272,14 @@ $shareUrlBase = $id
 
     <form method="post" id="createForm">
         <input type="hidden" name="csrf" value="<?= htmlspecialchars($_SESSION['csrf'], ENT_QUOTES, 'UTF-8') ?>">
-        <textarea id="content" placeholder="Write your note here..." autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Note content"></textarea>
+        <textarea 
+            id="content"
+            name="content"
+            placeholder="Write your note here..."
+            autocomplete="off"
+            autocapitalize="off"
+            spellcheck="false"
+            aria-label="Note content"></textarea>
         <div class="counter" id="counter">0 / 100000 characters</div>
        
         <div class="actions">
@@ -304,7 +307,13 @@ $shareUrlBase = $id
     <form method="post" id="editForm">
         <input type="hidden" name="csrf" value="<?= htmlspecialchars($_SESSION['csrf'], ENT_QUOTES, 'UTF-8') ?>">
         <input type="hidden" name="id" value="<?= htmlspecialchars($id, ENT_QUOTES, 'UTF-8') ?>">
-        <textarea id="content" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Note content"></textarea>
+        <textarea 
+            id="content"
+            name="content"
+            autocomplete="off"
+            autocapitalize="off"
+            spellcheck="false"
+            aria-label="Note content"></textarea>
         <input type="hidden" id="encryptedData" value="<?= htmlspecialchars($noteContent, ENT_QUOTES, 'UTF-8') ?>">
        
         <div class="counter" id="counter">0 / 100000 characters</div>
