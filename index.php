@@ -123,7 +123,7 @@ function cleanupRateLimits($limitDir) {
 }
 
 // Run cleanups probabilistically (~1% of requests)
-if (random_int(1, 100) === 1) {
+if (random_int(1, 10) === 1) {
     cleanupOldNotes($notesDir);
     cleanupRateLimits(dirname(__DIR__) . '/storage/rate_limits');
 }
