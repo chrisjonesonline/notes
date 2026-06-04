@@ -11,7 +11,7 @@ Create a note → get a secret link. Anyone with the link can view and edit it. 
 - Cryptographically secure random note IDs and encryption keys
 - Collaborative editing
 - Hardened rate limiting (1 note per hour per IP)
-- Automatic cleanup deletes notes not modified for 30+ days (Probabilistically)
+- Automatic cleanup deletes notes not modified for 30+ days (Deterministically)
 - Strict security headers and secure session handling
 - Secure file storage with restricted permissions
 - Self-hosted and open source
@@ -28,7 +28,7 @@ Even if the server is compromised or subpoenaed, it only contains encrypted data
 - Collaboration is trust-based; security is trustless — anyone with the link can view/edit, and the last save wins (no version history or conflict resolution)
 - The link should only be shared through secure channels (e.g. Signal, encrypted email, or in-person)
 - Encryption protects note content, **not** metadata. The server can still see note IDs, access times, and IP addresses. Use a VPN or Tor for better privacy
-- Ephemeral rate-limit metadata — Hashed IP-based rate-limiting data is used for abuse prevention and is deleted automatically after 1 hour (Probabilistically)
+- Ephemeral rate-limit metadata — Hashed IP-based rate-limiting data is used for abuse prevention and is deleted automatically after 1 hour (Deterministically)
 - Browser security matters. Malicious **extensions** or **compromised devices** can access plaintext before encryption or after decryption. Don't use pwned devices or untrusted browser extensions
 
 ### Additional Privacy & Security Protections
