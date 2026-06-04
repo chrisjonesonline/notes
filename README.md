@@ -10,6 +10,10 @@ Create a note → get a secret link. Anyone with the link can view and edit it. 
 - Fully anonymous — no signup or email required
 - Cryptographically secure random note IDs and encryption keys
 - Collaborative editing
+- Automatic cleanup of expired notes
+- Hardened rate limiting and abuse protection
+- Strict security headers and secure session handling
+- Secure file storage with restricted permissions
 - Self-hosted and open source
 - Clean, mobile-friendly interface
 
@@ -47,7 +51,5 @@ The application includes standard security hardening against common web attacks:
 5. Done
 
 **Try it:** [https://notes.chrisjones.online](https://notes.chrisjones.online)
-
-**Note:** The above site is a public demo. Notes saved on our servers may be deleted without prior notice at any time in the event of an asshole filling up our storage needlessly. For the best experience, self-host your own copy.
 
 Made with ❤️ for privacy.
