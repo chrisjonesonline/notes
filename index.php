@@ -89,7 +89,7 @@ if (!isset($_SESSION['csrf'])) {
 
 /*
 |--------------------------------------------------------------------------
-| Automatic cleanup deletes notes not accessed for 30+ days (Probabilistic)
+| Automatic cleanup deletes notes not modified for 30+ days (Probabilistic)
 |--------------------------------------------------------------------------
 */
 function cleanupOldNotes($notesDir) {
@@ -104,8 +104,28 @@ function cleanupOldNotes($notesDir) {
     }
 }
 
+/*
+|--------------------------------------------------------------------------
+| Cleanup Rate Limit Files (24 hours old)
+|--------------------------------------------------------------------------
+*/
+function cleanupRateLimits($limitDir) {
+    $threshold = time() - (24 * 60 * 60); // 24 hours
+
+    if (!is_dir($limitDir)) return;
+
+    foreach (glob($limitDir . '/*.json') as $file) {
+        $modified = @filemtime($file);
+        if ($modified !== false && $modified < $threshold) {
+            @unlink($file);
+        }
+    }
+}
+
+// Run cleanups probabilistically (~1% of requests)
 if (random_int(1, 100) === 1) {
     cleanupOldNotes($notesDir);
+    cleanupRateLimits(dirname(__DIR__) . '/storage/rate_limits');
 }
 
 /*
@@ -262,7 +282,7 @@ $shareUrlBase = $id
     <h1>Anonymous Cloud Notes</h1>
    
     <p class="tagline">
-        ✓ Anonymous ✓ End-to-end encrypted ✓ No tracking ✓ Instant sharing ✓ Collaborative editing ✓ Free &
+        ✓ Anonymous ✓ End-to-end encrypted ✓ Privacy-first ✓ Instant sharing ✓ Collaborative editing ✓ Free &
         <a href="https://github.com/chrisjonesonline/notes" target="_blank" rel="noopener noreferrer nofollow">Open Source</a>
     </p>
 
