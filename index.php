@@ -2,6 +2,15 @@
 
 /*
 |--------------------------------------------------------------------------
+| Anonymous Cloud Notes - Main Entry Point
+|--------------------------------------------------------------------------
+| Single file application. All encryption happens client-side.
+| Server only stores encrypted ciphertext.
+|--------------------------------------------------------------------------
+*/
+
+/*
+|--------------------------------------------------------------------------
 | Security Note
 |--------------------------------------------------------------------------
 | These defaults are intentionally strict.
@@ -51,7 +60,7 @@ header(
     "default-src 'self'; " .
     "script-src 'self'; " .
     "style-src 'self'; " .
-    "connect-src 'self'; " .          // Added for AJAX/fetch requests
+    "connect-src 'self'; " .
     "object-src 'none'; " .
     "base-uri 'none'; " .
     "frame-ancestors 'none'; " .
@@ -60,10 +69,11 @@ header(
 
 /*
 |--------------------------------------------------------------------------
-| Configuration
+| Configuration - CHANGE THESE FOR SELF-HOSTING
 |--------------------------------------------------------------------------
 */
-$baseUrl = 'https://notes.chrisjones.online';
+$baseUrl = 'https://notes.chrisjones.online';   // ←←← CHANGE TO YOUR DOMAIN
+
 $notesDir = dirname(__DIR__) . '/storage/notes';
 
 if (!is_dir($notesDir)) {
@@ -79,6 +89,90 @@ if (!isset($_SESSION['csrf'])) {
 
 /*
 |--------------------------------------------------------------------------
+| Automatic Cleanup: Delete notes not accessed in 30+ days (Probabilistic)
+|--------------------------------------------------------------------------
+| Runs on ~1% of requests to keep performance impact minimal.
+|--------------------------------------------------------------------------
+*/
+function cleanupOldNotes($notesDir) {
+    $threshold = time() - (30 * 24 * 60 * 60); // 30 days
+    if (!is_dir($notesDir)) return;
+
+    foreach (glob($notesDir . '/*.txt') as $file) {
+        $modified = @filemtime($file);
+        if ($modified !== false && $modified < $threshold) {
+            @unlink($file);
+        }
+    }
+}
+
+if (random_int(1, 100) === 1) {
+    cleanupOldNotes($notesDir);
+}
+
+/*
+|--------------------------------------------------------------------------
+| Rate Limiting (1 note per hour per IP) - Fully Hardened
+|--------------------------------------------------------------------------
+*/
+function checkRateLimit() {
+    $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+    $limitDir = dirname(__DIR__) . '/storage/rate_limits';
+    $limitFile = $limitDir . '/' . md5($ip) . '.json';
+    
+    if (!is_dir($limitDir)) {
+        if (!mkdir($limitDir, 0700, true)) {
+            return;
+        }
+    }
+
+    $fp = fopen($limitFile, 'c+');
+    if (!$fp) return;
+
+    if (!flock($fp, LOCK_EX)) {
+        fclose($fp);
+        return;
+    }
+
+    rewind($fp);
+    $content = stream_get_contents($fp);
+
+    $data = ['count' => 0, 'reset_time' => time() + 3600];
+
+    if ($content) {
+        $decoded = json_decode($content, true);
+        if (is_array($decoded) && isset($decoded['count'], $decoded['reset_time'])) {
+            $data = $decoded;
+        }
+    }
+
+    if (time() > $data['reset_time']) {
+        $data = ['count' => 0, 'reset_time' => time() + 3600];
+    }
+
+    if ($data['count'] >= 1) {
+        flock($fp, LOCK_UN);
+        fclose($fp);
+        http_response_code(429);
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode([
+            'success' => false,
+            'error' => 'Rate limit reached. Only 1 new note per hour allowed. Please try again later.'
+        ]);
+        exit;
+    }
+
+    $data['count']++;
+    ftruncate($fp, 0);
+    rewind($fp);
+    fwrite($fp, json_encode($data));
+    fflush($fp);
+    flock($fp, LOCK_UN);
+    fclose($fp);
+}
+
+/*
+|--------------------------------------------------------------------------
 | Handle POST Requests
 |--------------------------------------------------------------------------
 | Note: Actual encryption happens in the browser (script.js)
@@ -89,33 +183,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (!hash_equals($_SESSION['csrf'], $_POST['csrf'] ?? '')) {
         http_response_code(403);
-        exit('CSRF error');
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['success' => false, 'error' => 'CSRF error']);
+        exit;
+    }
+
+    if (empty($_POST['id'])) {
+        checkRateLimit();
     }
 
     $content = $_POST['content'] ?? '';
    
     if (strlen($content) > 500000) {
         http_response_code(413);
-        exit('Note too large');
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['success' => false, 'error' => 'Note too large']);
+        exit;
     }
 
     $id = $_POST['id'] ?? bin2hex(random_bytes(16));
 
     if (!preg_match('/^[a-f0-9]{32}$/', $id)) {
         http_response_code(400);
-        exit('Invalid note ID');
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['success' => false, 'error' => 'Invalid note ID']);
+        exit;
     }
 
     $file = $notesDir . '/' . $id . '.txt';
    
     if (file_put_contents($file, $content, LOCK_EX) === false) {
         http_response_code(500);
-        exit('Failed to save note');
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['success' => false, 'error' => 'Failed to save note']);
+        exit;
     }
 
-    chmod($file, 0600);
+    @chmod($file, 0600);
 
-    // More explicit AJAX check
     if (($_POST['ajax'] ?? '') === '1') {
         header('Content-Type: application/json; charset=utf-8');
         echo json_encode(['success' => true, 'id' => $id]);
@@ -162,9 +267,7 @@ $shareUrlBase = $id
    
     <p class="tagline">
         ✓ Anonymous ✓ End-to-end encrypted ✓ No tracking ✓ Instant sharing ✓ Collaborative editing ✓ Free &
-        <a href="https://github.com/chrisjonesonline/notes"
-           target="_blank"
-           rel="noopener noreferrer nofollow">Open Source</a>
+        <a href="https://github.com/chrisjonesonline/notes" target="_blank" rel="noopener noreferrer nofollow">Open Source</a>
     </p>
 
     <p class="description">
@@ -173,13 +276,7 @@ $shareUrlBase = $id
 
     <form method="post" id="createForm">
         <input type="hidden" name="csrf" value="<?= htmlspecialchars($_SESSION['csrf'], ENT_QUOTES, 'UTF-8') ?>">
-        <textarea
-            id="content"
-            placeholder="Write your note here..."
-            autocomplete="off"
-            autocapitalize="off"
-            spellcheck="false"
-            aria-label="Note content"></textarea>
+        <textarea id="content" placeholder="Write your note here..." autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Note content"></textarea>
         <div class="counter" id="counter">0 / 100000 characters</div>
        
         <div class="actions">
@@ -207,12 +304,7 @@ $shareUrlBase = $id
     <form method="post" id="editForm">
         <input type="hidden" name="csrf" value="<?= htmlspecialchars($_SESSION['csrf'], ENT_QUOTES, 'UTF-8') ?>">
         <input type="hidden" name="id" value="<?= htmlspecialchars($id, ENT_QUOTES, 'UTF-8') ?>">
-        <textarea
-            id="content"
-            autocomplete="off"
-            autocapitalize="off"
-            spellcheck="false"
-            aria-label="Note content"></textarea>
+        <textarea id="content" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Note content"></textarea>
         <input type="hidden" id="encryptedData" value="<?= htmlspecialchars($noteContent, ENT_QUOTES, 'UTF-8') ?>">
        
         <div class="counter" id="counter">0 / 100000 characters</div>
