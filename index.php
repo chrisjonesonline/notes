@@ -89,11 +89,19 @@ if (!isset($_SESSION['csrf'])) {
 
 /*
 |--------------------------------------------------------------------------
-| Automatic cleanup deletes notes not modified for 30+ days (Probabilistic)
+| Constants
+|--------------------------------------------------------------------------
+*/
+define('NOTE_TTL', 30 * 24 * 60 * 60);        // 30 days
+define('RATE_LIMIT_TTL', 3600);               // 1 hour
+
+/*
+|--------------------------------------------------------------------------
+| Cleanup Functions
 |--------------------------------------------------------------------------
 */
 function cleanupOldNotes($notesDir) {
-    $threshold = time() - (30 * 24 * 60 * 60);
+    $threshold = time() - NOTE_TTL;
     if (!is_dir($notesDir)) return;
 
     foreach (glob($notesDir . '/*.txt') as $file) {
@@ -104,14 +112,8 @@ function cleanupOldNotes($notesDir) {
     }
 }
 
-/*
-|--------------------------------------------------------------------------
-| Cleanup Rate Limit Files (1 hour old)
-|--------------------------------------------------------------------------
-*/
 function cleanupRateLimits($limitDir) {
-    $threshold = time() - (1 * 60 * 60); // time
-
+    $threshold = time() - RATE_LIMIT_TTL;
     if (!is_dir($limitDir)) return;
 
     foreach (glob($limitDir . '/*.json') as $file) {
@@ -122,24 +124,30 @@ function cleanupRateLimits($limitDir) {
     }
 }
 
-// Run cleanups probabilistically (~1% of requests)
-if (random_int(1, 10) === 1) {
-    cleanupOldNotes($notesDir);
-    cleanupRateLimits(dirname(__DIR__) . '/storage/rate_limits');
-}
+// Run cleanup deterministically on every request
+cleanupOldNotes($notesDir);
+cleanupRateLimits(dirname(__DIR__) . '/storage/rate_limits');
 
 /*
 |--------------------------------------------------------------------------
-| Hardened Rate Limiting (1 note per hour per IP)
+| Rate Limiting (1 note per hour per IP) - Fully Hardened
 |--------------------------------------------------------------------------
 */
 function checkRateLimit() {
     $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
     $limitDir = dirname(__DIR__) . '/storage/rate_limits';
     $limitFile = $limitDir . '/' . md5($ip) . '.json';
-    
+
     if (!is_dir($limitDir)) {
         if (!mkdir($limitDir, 0700, true)) return;
+    }
+
+    // Pre-check and clean expired file
+    if (is_file($limitFile)) {
+        $data = json_decode(file_get_contents($limitFile), true);
+        if (is_array($data) && isset($data['reset_time']) && time() > $data['reset_time']) {
+            @unlink($limitFile);
+        }
     }
 
     $fp = fopen($limitFile, 'c+');
@@ -153,7 +161,7 @@ function checkRateLimit() {
     rewind($fp);
     $content = stream_get_contents($fp);
 
-    $data = ['count' => 0, 'reset_time' => time() + 3600];
+    $data = ['count' => 0, 'reset_time' => time() + RATE_LIMIT_TTL];
 
     if ($content) {
         $decoded = json_decode($content, true);
@@ -163,7 +171,11 @@ function checkRateLimit() {
     }
 
     if (time() > $data['reset_time']) {
-        $data = ['count' => 0, 'reset_time' => time() + 3600];
+        ftruncate($fp, 0);
+        flock($fp, LOCK_UN);
+        fclose($fp);
+        @unlink($limitFile);
+        return;
     }
 
     if ($data['count'] >= 1) {
@@ -282,7 +294,7 @@ $shareUrlBase = $id
     <h1>Anonymous Cloud Notes</h1>
    
     <p class="tagline">
-        ✓ Anonymous ✓ End-to-end encrypted ✓ Privacy-first ✓ Instant sharing ✓ Collaborative editing ✓ Free &
+        ✓ Anonymous ✓ End-to-end encrypted ✓ No tracking ✓ Instant sharing ✓ Collaborative editing ✓ Free &
         <a href="https://github.com/chrisjonesonline/notes" target="_blank" rel="noopener noreferrer nofollow">Open Source</a>
     </p>
 
