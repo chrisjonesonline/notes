@@ -165,6 +165,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         document.getElementById('keyDisplay').textContent = key;
 
+        // Build the share URL explicitly so the encryption key is always preserved.
+        const shareUrl = `${location.origin}${location.pathname}${location.search}#${key}`;
+        const shareLink = document.getElementById('shareLink');
+        if (shareLink) shareLink.href = shareUrl;
+
         if (encryptedData && encryptedData.value) {
             const decrypted = await decrypt(encryptedData.value, key);
             if (decrypted !== null) {
@@ -184,8 +189,29 @@ document.addEventListener('DOMContentLoaded', async () => {
 /* ===================== BUTTONS ===================== */
 if (copyButton) {
     copyButton.addEventListener('click', async () => {
+        const currentKey = location.hash.slice(1);
+        if (!currentKey) {
+            alert('Missing encryption key.');
+            return;
+        }
+
+        const shareUrl = `${location.origin}${location.pathname}${location.search}#${currentKey}`;
+
         try {
-            await navigator.clipboard.writeText(location.href);
+            if (navigator.clipboard && window.isSecureContext) {
+                await navigator.clipboard.writeText(shareUrl);
+            } else {
+                const temp = document.createElement('textarea');
+                temp.value = shareUrl;
+                temp.setAttribute('readonly', '');
+                temp.style.position = 'fixed';
+                temp.style.opacity = '0';
+                document.body.appendChild(temp);
+                temp.select();
+                if (!document.execCommand('copy')) throw new Error('Copy failed');
+                temp.remove();
+            }
+
             const original = copyButton.textContent;
             copyButton.textContent = 'Copied!';
             setTimeout(() => copyButton.textContent = original, 1500);

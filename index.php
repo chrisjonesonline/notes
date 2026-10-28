@@ -74,7 +74,9 @@ header(
 */
 $baseUrl = 'https://notes.chrisjones.online';   // ← CHANGE TO YOUR DOMAIN
 
-$notesDir = dirname(__DIR__) . '/storage/notes';
+$storageDir = dirname(__DIR__) . '/storage/notes';
+$notesDir = $storageDir . '/notes';
+$limitDir = $storageDir . '/rate_limits';
 
 if (!is_dir($notesDir)) {
     if (!mkdir($notesDir, 0700, true)) {
@@ -126,7 +128,7 @@ function cleanupRateLimits($limitDir) {
 
 // Run cleanup deterministically on every request
 cleanupOldNotes($notesDir);
-cleanupRateLimits(dirname(__DIR__) . '/storage/rate_limits');
+cleanupRateLimits($limitDir);
 
 /*
 |--------------------------------------------------------------------------
@@ -134,8 +136,8 @@ cleanupRateLimits(dirname(__DIR__) . '/storage/rate_limits');
 |--------------------------------------------------------------------------
 */
 function checkRateLimit() {
+    global $limitDir;
     $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
-    $limitDir = dirname(__DIR__) . '/storage/rate_limits';
     $limitFile = $limitDir . '/' . md5($ip) . '.json';
 
     if (!is_dir($limitDir)) {
